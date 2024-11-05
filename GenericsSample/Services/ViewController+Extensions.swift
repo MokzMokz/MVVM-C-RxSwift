@@ -7,6 +7,10 @@
 
 import UIKit
 
-class ViewController_Extensions: NSObject {
-
+extension UIViewController {
+    func removeBackButtonTitle() {
+        let backButton = UIBarButtonItem()
+        backButton.title = ""
+        navigationController?.navigationBar.topItem?.backBarButtonItem = backButton
+    }
 }

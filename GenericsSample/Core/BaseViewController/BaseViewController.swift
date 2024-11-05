@@ -20,22 +20,27 @@ protocol ViewModelable where Self: UIViewController {
     var disposeBag: DisposeBag { get }
 }
 
+protocol BaseViewControllerType: UIViewController {
+  
+  // MARK: - Setups
+  func setupData()
+  func setupView()
+  func setupObservers()
 
-class BaseViewController<BaseViewModel: ViewModel>: UIViewController {
-    
-    var viewModel: ViewModel
-    
-    init(viewModel: ViewModel) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+}
+
+
+class BaseViewController<VM: BaseViewModel>: UIViewController, BaseViewControllerType {
+    var viewModel: VM!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Perform common setup for all view controllers here, if needed
+        setupView()
+        setupObservers()
     }
+    
+    func setupData() { }
+    func setupView() { }
+    func setupObservers() { }
 }

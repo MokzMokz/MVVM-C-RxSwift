@@ -47,3 +47,9 @@ extension StoryboardInitializable where Self: Coordinator {
         
     }
 }
+
+protocol StoryboardInitializable {
+    static var storyboardIdentifier: String { get }
+    static var storyboardName: UIStoryboard.Storyboard { get }
+    static func instantiateViewController() -> UIViewController
+}

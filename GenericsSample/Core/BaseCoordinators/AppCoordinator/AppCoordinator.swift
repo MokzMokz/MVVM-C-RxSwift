@@ -11,16 +11,19 @@ import UIKit
 
 final class AppCoordinator : Coordinator{
     private var window : UIWindow?
+    private var navigationController: UINavigationController!
+    private var dashBoardCoordinator : DashBoardCoordinator!
     
     init(window : UIWindow) {
         self.window = window
     }
-    var loginCoordinator : LoginCoordinator!
     
     @discardableResult
     func start()->UIViewController{
-        loginCoordinator = LoginCoordinator()
-        let mainVC = loginCoordinator.start()
+        dashBoardCoordinator = DashBoardCoordinator()
+        let mainVC = dashBoardCoordinator.start()
+//        navigationController = UINavigationController(rootViewController: mainVC)
+//        navigationController.modalPresentationStyle = .fullScreen
         self.window?.rootViewController = mainVC
         self.window?.makeKeyAndVisible()
         return mainVC

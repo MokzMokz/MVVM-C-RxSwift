@@ -6,18 +6,53 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
+import RxDataSources
 
-class ServicesTableViewCell: UITableViewCell {
+class ServicesTableViewCell: UITableViewCell,
+                             BindableType,
+                             DashboardBindableType, UIScrollViewDelegate {
+  
+  var viewModel: ServiceViewModelType!
+  private let disposeBag = DisposeBag()
+  
+  @IBOutlet weak var collectionView: UICollectionView!
+  private var dataSource: RxCollectionViewSectionedReloadDataSource<DashboardSectionModel>!
+  
+  private func setupView() {
+    let layout = CustomFlowLayout()
+    collectionView.collectionViewLayout = layout
+    collectionView.backgroundColor = .green
+    collectionView.dataSource = nil
+    collectionView.delegate = nil
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
+    dataSource = RxCollectionViewSectionedReloadDataSource<DashboardSectionModel> {
+      (_, collectionView, indexPath, item) in
+
+      let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ServiceCollectionViewCell", for: indexPath)
+      if let cell = cell as? DashboardBindableType {
+        cell.bindItemModel(to: item)
+      }
+      return cell
     }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-
+    
+    collectionView.rx.itemSelected
+      .subscribe(onNext: { [weak self] indexPath in
+        
+        guard let self = self else { return }
+        
+        self.viewModel.navigateToService(at: indexPath)
+      })
+      .disposed(by: disposeBag)
+    
+    viewModel.services
+      .map { [DashboardSectionModel(items: $0)] } // Map your data to the expected structure
+      .bind(to: collectionView.rx.items(dataSource: dataSource))
+      .disposed(by: disposeBag)
+  }
+  
+  func bindViewModel() {
+    setupView()
+  }
 }

@@ -6,3 +6,9 @@
 //
 
 import Foundation
+import UIKit
+
+protocol CellConfigurable {
+    var cellTypeIdentifier: String { get }
+    func configureCell(_ cell: UITableViewCell)
+}

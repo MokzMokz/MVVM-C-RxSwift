@@ -6,19 +6,38 @@
 //
 
 import UIKit
+import RxRelay
 
-protocol ViewModel: AnyObject {
+protocol BaseViewModel {
+//  
+//  // MARK: - Properties
+//    // Define common properties or methods here
+//    //var list: BehaviorRelay<[CellConfigurable]> { get set }
+//    //var title: String { get set }
+//    
+//    func fetchData()
+//    //func rowCount() { get }
+}
+
+protocol DashboardBaseViewModelType {
+  associatedtype Input
+  associatedtype Output
   
-  // MARK: - Properties
-    // Define common properties or methods here
-    var title: String { get set }
-    func fetchData()
+  var input: Input { get }
+  var output: Output { get }
+    
+  func fetchData()
 }
 
-class BaseViewModel: ViewModel {
-    var title: String = ""
-        
-    func fetchData() {
-        // Implement the default behavior for fetching data here
-    }
-}
+
+//class BaseViewModel {
+////    var input: Input
+////    var output: Output
+//
+//    var list: BehaviorRelay<[CellConfigurable]> = BehaviorRelay(value: [])
+//    var title: String = ""
+//
+//    func fetchData() {
+//        // Implement the default behavior for fetching data here
+//    }
+//}

@@ -6,25 +6,100 @@
 //
 
 import UIKit
+import RxSwift
+import RxDataSources
 
-class DashBoardViewController: BaseViewController<DashBoardViewModel> {
 
-    @IBOutlet weak var tableView: UITableView!
+
+
+
+
+class DashBoardViewController: UIViewController {
+    
+    var viewModel: DashBoardViewModel!
+    @IBOutlet private weak var tableView: UITableView!
+    private let disposeBag = DisposeBag()
+  // profilelimit
+    // Create a data source for RxDataSources
+    private var dataSource: RxTableViewSectionedReloadDataSource<DashboardSectionModel>!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        
+        registerCell()
+        setupData()
+        setupView()
+        setupDataSource()
+      //tableview.heightfor
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+  
+    private func setupData() {
+        viewModel.fetchData()
+        
     }
-    */
+    
+    private func setupView() {
+    }
+    
+    private func registerCell() {
+    }
+    
+    private  func setupDataSource() {
+        dataSource = RxTableViewSectionedReloadDataSource<DashboardSectionModel>(
+            configureCell: { _, tableView, indexPath, item in
+                
+                let cell = tableView.dequeueReusableCell(withIdentifier: item.identifier, for: indexPath)
+                if let cell = cell as? DashboardBindableType {
+                    cell.bindItemModel(to: item)
+                }
+                cell.selectionStyle = .none
+                return cell
+            }
+        )
+        
+      
+        tableView
+            .rx
+            .setDelegate(self)
+            .disposed(by: disposeBag)
+        
+        tableView
+            .rx
+            .modelSelected(DashboardSectionItemModel.self)
+            .bind(to: viewModel.input.didSelectItem)
+            .disposed(by: disposeBag)
+        
+//      tableView.rx.rowHeight
+//        .onNext(UITableView.automaticDimension) // Set to automatic dimension
+//      tableView.rx.estimatedRowHeight
+//        .onNext(44.0) 
+      
+      // bindviewmodel
+        viewModel?
+            .output
+            .sectionModels
+            .asObservable()
+            .bind(to: tableView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+      
+//      viewModel?.output.rowHeight.asDriver().drive( onNext: { [weak self] height in
+//        
+//        guard let self = self else { return }
+//        self.tableView.rowHeight = height
+//      }).disposed(by: disposeBag)
+        
+    }
+}
 
+extension DashBoardViewController : UITableViewDelegate {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+       return viewModel?.heightForRow(row: indexPath.row) ?? UITableView.automaticDimension
+      //tableView.delegate?.tableView(table, heightForRowAt: <#T##IndexPath#>)
+
+    }
+}
+
+extension DashBoardViewController : UIScrollViewDelegate {
+    
 }
